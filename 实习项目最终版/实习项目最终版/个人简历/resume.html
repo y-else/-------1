@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>个人简历 - 刘寒冰</title>
+
+  <!-- Vue3 CDN 引入 -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
+  <style>
+    /* ==================== CSS 变量 - 主题色定义 ==================== */
+    :root {
+      /* 浅色主题（默认） */
+      --bg-primary: #f5f7fa;
+      --bg-card: #ffffff;
+      --text-primary: #2c3e50;
+      --text-secondary: #5a6d80;
+      --border-color: #e4e7eb;
+      --accent-color: #3498db;
+      --accent-light: #ebf5fb;
+      --progress-bg: #e8ecf1;
+      --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      --tag-bg: #f0f3f7;
+      --tag-text: #4a6785;
+      --input-bg: #ffffff;
+      --input-border: #d1d5db;
+    }
+
+    /* 深色主题变量覆盖 */
+    .dark-theme {
+      --bg-primary: #1a1d23;
+      --bg-card: #252830;
+      --text-primary: #e8eaed;
+      --text-secondary: #9aa0a6;
+      --border-color: #3c4043;
+      --accent-color: #5dade2;
+      --accent-light: #1e3a5f;
+      --progress-bg: #3c4043;
+      --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+      --tag-bg: #33363d;
+      --tag-text: #b0b8c4;
+      --input-bg: #2d3039;
+      --input-border: #4a4d56;
+    }
+
+    /* ==================== 全局重置与基础样式 ==================== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* ==================== 主容器布局 ==================== */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* ==================== 主题切换按钮 ==================== */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+      transition: all 0.3s;
+      z-index: 100;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    /* ==================== 卡片通用样式 ==================== */
+    .card {
+      background-color: var(--bg-card);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--accent-color);
+      display: inline-block;
+    }
+
+    /* ==================== 头部个人信息区域 ==================== */
+    .header-section {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-color), #2ecc71);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .header-info h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .header-info .subtitle {
+      font-size: 15px;
+      color: var(--accent-color);
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .contact-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      list-style: none;
+    }
+
+    .contact-list li {
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ==================== 技能展示区域 ==================== */
+    .skill-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .skill-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .skill-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .skill-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .skill-percent {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* 进度条样式 */
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: var(--progress-bg);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--accent-color), #2ecc71);
+      transition: width 0.8s ease;
+    }
+
+    /* 技能标签 */
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .skill-tag {
+      padding: 4px 12px;
+      font-size: 12px;
+      border-radius: 20px;
+      background-color: var(--tag-bg);
+      color: var(--tag-text);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* ==================== 项目展示区域 ==================== */
+    .project-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .project-item {
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-primary);
+      transition: all 0.3s;
+    }
+
+    .project-item:hover {
+      border-color: var(--accent-color);
+    }
+
+    .project-item h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .project-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .project-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .project-tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .project-tech span {
+      padding: 2px 8px;
+      font-size: 11px;
+      border-radius: 4px;
+      background-color: var(--accent-light);
+      color: var(--accent-color);
+    }
+
+    /* ==================== 留言表单区域 ==================== */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 14px;
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      background-color: var(--input-bg);
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.3s, background-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent-color);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* 校验错误提示 */
+    .error-msg {
+      color: #e74c3c;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    /* 提交按钮 */
+    .btn-submit {
+      padding: 10px 28px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      background-color: var(--accent-color);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.3s;
+    }
+
+    .btn-submit:hover {
+      opacity: 0.85;
+    }
+
+    /* 留言列表 */
+    .message-list {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .message-item {
+      padding: 14px;
+      border-radius: 8px;
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .message-item .msg-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .message-item .msg-time {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-left: 8px;
+    }
+
+    .message-item .msg-content {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      line-height: 1.6;
+    }
+
+    /* ==================== 页脚 ==================== */
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 20px 0;
+    }
+
+    /* ==================== 响应式 - 移动端适配 ==================== */
+    @media (max-width: 600px) {
+      .container {
+        padding: 14px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .header-section {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .contact-list {
+        justify-content: center;
+      }
+
+      .header-info h1 {
+        font-size: 22px;
+      }
+
+      .theme-toggle {
+        top: 12px;
+        right: 12px;
+        width: 38px;
+        height: 38px;
+        font-size: 17px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Vue3 应用挂载点 -->
+  <div id="app">
+
+    <!-- 主题切换按钮 -->
+    <button class="theme-toggle" @click="toggleTheme" :title="isDark ? '切换浅色' : '切换深色'">
+      {{ isDark ? '☀️' : '🌙' }}
+    </button>
+
+    <div class="container">
+
+      <!-- ==================== 头部个人信息 ==================== -->
+      <section class="card header-section">
+        <div class="avatar">刘</div>
+        <div class="header-info">
+          <h1>{{ profile.name }}</h1>
+          <div class="subtitle">{{ profile.title }}</div>
+          <ul class="contact-list">
+            <li v-for="item in profile.contacts" :key="item.label">
+              {{ item.label }}：{{ item.value }}
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ==================== 技能展示 ==================== -->
+      <section class="card">
+        <h2 class="section-title">专业技能</h2>
+        <div class="skill-list">
+          <div class="skill-item" v-for="skill in skills" :key="skill.name">
+            <div class="skill-header">
+              <span class="skill-name">{{ skill.name }}</span>
+              <span class="skill-percent">{{ skill.level }}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" :style="{ width: skill.level + '%' }"></div>
+            </div>
+          </div>
+        </div>
+        <!-- 技能标签动态展示 -->
+        <div class="skill-tags">
+          <span class="skill-tag" v-for="tag in skillTags" :key="tag">{{ tag }}</span>
+        </div>
+      </section>
+
+      <!-- ==================== 项目展示 ==================== -->
+      <section class="card">
+        <h2 class="section-title">项目经历</h2>
+        <div class="project-list">
+          <div class="project-item" v-for="project in projects" :key="project.name">
+            <h3>{{ project.name }}</h3>
+            <div class="project-meta">{{ project.role }} · {{ project.time }}</div>
+            <div class="project-desc">{{ project.desc }}</div>
+            <div class="project-tech">
+              <span v-for="tech in project.techs" :key="tech">{{ tech }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 留言表单 ==================== -->
+      <section class="card">
+        <h2 class="section-title">访客留言</h2>
+
+        <form @submit.prevent="submitMessage">
+          <!-- 姓名 -->
+          <div class="form-group">
+            <label>姓名</label>
+            <input
+              type="text"
+              v-model="form.name"
+              placeholder="请输入您的姓名"
+            />
+            <div class="error-msg" v-if="errors.name">{{ errors.name }}</div>
+          </div>
+
+          <!-- 留言内容 -->
+          <div class="form-group">
+            <label>留言内容</label>
+            <textarea
+              v-model="form.content"
+              placeholder="请输入留言内容"
+            ></textarea>
+            <div class="error-msg" v-if="errors.content">{{ errors.content }}</div>
+          </div>
+
+          <button class="btn-submit" type="submit">提交留言</button>
+        </form>
+
+        <!-- 留言列表 -->
+        <div class="message-list" v-if="messages.length">
+          <div class="message-item" v-for="(msg, index) in messages" :key="index">
+            <span class="msg-name">{{ msg.name }}</span>
+            <span class="msg-time">{{ msg.time }}</span>
+            <div class="msg-content">{{ msg.content }}</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 页脚 -->
+      <footer class="footer">
+        © 2025 刘寒冰 · 个人简历展示页
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // ==================== Vue3 应用逻辑 ====================
+    var app = Vue.createApp({
+      data: function () {
+        return {
+          // ---------- 主题状态 ----------
+          isDark: false,
+
+          // ---------- 个人信息 ----------
+          profile: {
+            name: '刘寒冰',
+            title: '前端开发工程师 · 2025届应届生',
+            contacts: [
+              { label: '电话', value: '138-0000-0000' },
+              { label: '邮箱', value: 'liuhanbing@example.com' },
+              { label: 'GitHub', value: 'github.com/liuhanbing' },
+              { label: '所在地', value: '武汉' }
+            ]
+          },
+
+          // ---------- 技能列表（含熟练度） ----------
+          skills: [
+            { name: 'HTML5 / CSS3', level: 90 },
+            { name: 'JavaScript / ES6+', level: 80 },
+            { name: 'Vue3', level: 75 },
+            { name: 'React', level: 60 },
+            { name: 'Node.js', level: 55 },
+            { name: 'Git / GitHub', level: 70 }
+          ],
+
+          // ---------- 技能标签 ----------
+          skillTags: [
+            'Flex布局', '响应式设计', 'Vue3 Composition API',
+            '组件化开发', 'Vuex / Pinia', 'Vue Router',
+            'Element Plus', 'ECharts', 'Webpack / Vite',
+            'RESTful API', 'MySQL', 'Linux 基础'
+          ],
+
+          // ---------- 项目经历 ----------
+          projects: [
+            {
+              name: '电商后台管理系统',
+              role: '前端开发',
+              time: '2024.09 - 2024.12',
+              desc: '基于 Vue3 + Element Plus 开发的后台管理系统，包含用户管理、商品管理、订单管理等模块，实现了权限控制与数据可视化功能。',
+              techs: ['Vue3', 'Element Plus', 'Pinia', 'Axios', 'ECharts']
+            },
+            {
+              name: '个人博客系统',
+              role: '全栈开发',
+              time: '2024.03 - 2024.06',
+              desc: '使用 Node.js + Express 搭建后端 API，前端采用 Vue3 实现 SSR 渲染，支持 Markdown 文章编辑与标签分类功能。',
+              techs: ['Vue3', 'Node.js', 'Express', 'MongoDB', 'Markdown']
+            },
+            {
+              name: '天气预报小程序',
+              role: '前端开发',
+              time: '2023.10 - 2024.01',
+              desc: '微信小程序项目，调用和风天气 API 实现城市天气查询、7日预报、生活指数等功能，已上线使用。',
+              techs: ['微信小程序', 'WeUI', 'API 对接']
+            }
+          ],
+
+          // ---------- 留言表单 ----------
+          form: {
+            name: '',
+            content: ''
+          },
+
+          // ---------- 校验错误信息 ----------
+          errors: {
+            name: '',
+            content: ''
+          },
+
+          // ---------- 留言列表 ----------
+          messages: []
+        };
+      },
+
+      methods: {
+        // 切换深色/浅色主题
+        toggleTheme: function () {
+          this.isDark = !this.isDark;
+          if (this.isDark) {
+            document.body.classList.add('dark-theme');
+          } else {
+            document.body.classList.remove('dark-theme');
+          }
+          // 主题偏好存入 localStorage
+          localStorage.setItem('resume-theme', this.isDark ? 'dark' : 'light');
+        },
+
+        // 表单非空校验
+        validate: function () {
+          var valid = true;
+          // 姓名校验
+          if (!this.form.name.trim()) {
+            this.errors.name = '请输入姓名';
+            valid = false;
+          } else {
+            this.errors.name = '';
+          }
+          // 留言内容校验
+          if (!this.form.content.trim()) {
+            this.errors.content = '请输入留言内容';
+            valid = false;
+          } else {
+            this.errors.content = '';
+          }
+          return valid;
+        },
+
+        // 提交留言
+        submitMessage: function () {
+          if (!this.validate()) return;
+
+          // 构建留言对象
+          var message = {
+            name: this.form.name.trim(),
+            content: this.form.content.trim(),
+            time: this.formatTime(new Date())
+          };
+
+          // 添加到列表顶部
+          this.messages.unshift(message);
+
+          // 存入 localStorage，刷新不丢失
+          localStorage.setItem('resume-messages', JSON.stringify(this.messages));
+
+          // 清空表单
+          this.form.name = '';
+          this.form.content = '';
+        },
+
+        // 格式化时间
+        formatTime: function (date) {
+          var y = date.getFullYear();
+          var m = String(date.getMonth() + 1).padStart(2, '0');
+          var d = String(date.getDate()).padStart(2, '0');
+          var h = String(date.getHours()).padStart(2, '0');
+          var min = String(date.getMinutes()).padStart(2, '0');
+          return y + '-' + m + '-' + d + ' ' + h + ':' + min;
+        },
+
+        // 从 localStorage 恢复留言
+        loadMessages: function () {
+          var saved = localStorage.getItem('resume-messages');
+          if (saved) {
+            try {
+              this.messages = JSON.parse(saved);
+            } catch (e) {
+              this.messages = [];
+            }
+          }
+        },
+
+        // 从 localStorage 恢复主题偏好
+        loadTheme: function () {
+          var theme = localStorage.getItem('resume-theme');
+          if (theme === 'dark') {
+            this.isDark = true;
+            document.body.classList.add('dark-theme');
+          }
+        }
+      },
+
+      // 组件挂载时，恢复本地数据
+      mounted: function () {
+        this.loadMessages();
+        this.loadTheme();
+      }
+    });
+
+    // 挂载 Vue 应用
+    app.mount('#app');
+  </script>
+</body>
+</html>
